@@ -1,0 +1,148 @@
+{
+  "name": "[CLIENT] PDF TO GEMINI",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "PDF",
+        "formDescription": "upload pdf",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload Pdf",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Prompt",
+              "placeholder": "Enter your prompt here",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0f7dbfbb-50e9-42ed-bc07-92b510993eb9",
+      "name": "Upload PDF With Prompt",
+      "webhookId": "b23ee4f5-e5c8-437c-bfb4-c49591626e63"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"{{ $json.Prompt }}\" },\n      {\n        \"inline_data\": {\n          \"mime_type\": \"application/pdf\",\n          \"data\": \"{{ $json.pdf_text }}\"\n        }\n      }\n    ]\n  }]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        100
+      ],
+      "id": "3ce72656-fbb1-40da-92d7-985548112c8e",
+      "name": "Gemini",
+      "notesInFlow": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SXhVjmwCuquLt4sv",
+          "name": "Google Gemini(PaLM) Api account"
+        },
+        "httpQueryAuth": {
+          "id": "jofjYZL8w9vFOo42",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "Upload_Pdf",
+        "destinationKey": "pdf_text",
+        "options": {
+          "keepSource": "json"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "8d3b4afb-ef01-4298-8bed-127d00518aed",
+      "name": "Process File",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        -140
+      ],
+      "id": "29db49a7-35b2-4b95-897b-274b621d3b72",
+      "name": "Claude",
+      "notesInFlow": true,
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload PDF With Prompt": {
+      "main": [
+        [
+          {
+            "node": "Process File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "main": [
+        []
+      ]
+    },
+    "Process File": {
+      "main": [
+        [
+          {
+            "node": "Gemini",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3df76786-605c-4519-a811-f2d4b1edf5ad",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f5b63e87d3a08027ad82f6128c42aba4f9d740ea0a50198c3429cc351736bda0"
+  },
+  "id": "38nUNa7FAhe1Lred",
+  "tags": []
+}

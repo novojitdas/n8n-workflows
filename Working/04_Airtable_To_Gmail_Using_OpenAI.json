@@ -1,0 +1,169 @@
+{
+  "name": "[TEST] Airtable To Gmail Using OpenAI",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appf87M6kKvHJYBlx/tblYyXCytwTpRUAvE/viwlp6k2IOsj5wdtQ",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appf87M6kKvHJYBlx/tblYyXCytwTpRUAvE/viwlp6k2IOsj5wdtQ",
+          "mode": "url"
+        },
+        "triggerField": "Order Number",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9738b59a-59fd-42d1-bac6-afb3fb144e5a",
+      "name": "Airtable Trigger",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "KZZyRxtgnVQLajOz",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Create Airtable Trigger\n- Then paste the table link in base and table \n- Add the column name on trigger field\n\n",
+        "height": 320,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -180
+      ],
+      "id": "7c954af8-bd32-419e-8b33-85cb9b5cf792",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-NANO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are responsible for customer order. your task is to collect incoming information about new orders and create a clear summary that will sent via email to the team. The email should be signed with \"Customer success Team\". \n\nHere is the detailed about customer order: \nOrder Number: {{ $json.fields['Order Number'] }}\nCustomer Name: {{ $json.fields['Customer Name'] }}\nProduct: {{ $json.fields.Product }}\nPrice: {{ $json.fields.Price }}\nPayment Status: {{ $json.fields['Payment Status'] }}\n\nFollowing Output Parameter: \nEmail_Subject \nEmail_Content \n\nMake a clean body with new line if needed"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        0
+      ],
+      "id": "28ee0ff6-7c14-4081-bf32-896a8c4ab9fd",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "hj97vOttFgCA2NqG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## OpenAI Prompt\nYou are responsible for customer order. your task is to collect incoming information about new orders and create a clear summary that will sent via email to the team. The email should be signed with \"Customer success Team\". \n\nHere is the detailed about customer order: \nOrder Number: {{ $json.fields['Order Number'] }}\nCustomer Name: {{ $json.fields['Customer Name'] }}\nProduct: {{ $json.fields.Product }}\nPrice: {{ $json.fields.Price }}\nPayment Status: {{ $json.fields['Payment Status'] }}\n\nFollowing Output Parameter: \nEmail_Subject \nEmail_Content \n\nMake a new line with new body if needed\n",
+        "height": 420,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        -320
+      ],
+      "id": "8c595bf3-3b10-4926-b22a-cec505ebee8e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sendTo": "novojit.bengal@gmail.com",
+        "subject": "={{ $json.message.content.Email_Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message.content.Email_Content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        580,
+        0
+      ],
+      "id": "d018782d-f55c-487d-bed7-b7cda4052279",
+      "name": "Gmail",
+      "webhookId": "d01a3e89-ff05-4ecd-b367-94b470b6abd3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xXIhUxTnggBtVBn7",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "34ed4aa1-610b-466d-ba36-b325f77842ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f5b63e87d3a08027ad82f6128c42aba4f9d740ea0a50198c3429cc351736bda0"
+  },
+  "id": "OJSZawcSNFMfJ3iK",
+  "tags": []
+}

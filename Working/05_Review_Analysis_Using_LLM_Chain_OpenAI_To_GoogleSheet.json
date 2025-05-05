@@ -1,0 +1,247 @@
+{
+  "name": "[Test] Review Analysis Using LLM",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Review",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Your Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Review",
+              "fieldType": "textarea",
+              "placeholder": "Your Review",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -100,
+        -60
+      ],
+      "id": "30c0098d-1aaf-4f5c-b9a9-d560c8e4d61e",
+      "name": "On form submission",
+      "webhookId": "2e41bae2-5a32-4223-93f5-ed0f41e85d88"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Review }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are expert in sentiment analysis.|You conduct evaluations and determine which of the three options applies: Positive Negative Neutral. You respond with only one word."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        180,
+        60
+      ],
+      "id": "ebf47fe9-5148-45e8-94fb-eaab2bd734cd",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        240
+      ],
+      "id": "5be595d6-69b2-4666-8ca6-2e293720e146",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "hj97vOttFgCA2NqG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Prompt\nYou are expert in sentiment analysis.|You conduct evaluations and determine which of the three options applies: Positive Negative Neutral. You respond with only one word.\n",
+        "height": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -180
+      ],
+      "id": "31001fb9-46f5-49f8-b30a-fd4e7e9a1243",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        -120
+      ],
+      "id": "2ded1756-641b-46f2-9f12-6c198af054ae",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ak9u52GG0s7HUlOefA8JHzf3KZc9aQV1A-6co3DNST4",
+          "mode": "list",
+          "cachedResultName": "I am created using n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ak9u52GG0s7HUlOefA8JHzf3KZc9aQV1A-6co3DNST4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ak9u52GG0s7HUlOefA8JHzf3KZc9aQV1A-6co3DNST4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "ReviewStatus": "={{ $json.text }}",
+            "Review": "={{ $json.Review }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ReviewStatus",
+              "displayName": "ReviewStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Review",
+              "displayName": "Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        780,
+        -120
+      ],
+      "id": "1cebca77-60af-47fc-95dc-0760262667b3",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VoqCMzKfQ81bbmrS",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cd850abe-3acb-4013-bf02-33da2ce92b8e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f5b63e87d3a08027ad82f6128c42aba4f9d740ea0a50198c3429cc351736bda0"
+  },
+  "id": "j2o9tijJJ2u6c5ZH",
+  "tags": []
+}

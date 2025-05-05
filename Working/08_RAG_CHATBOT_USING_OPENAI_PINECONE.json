@@ -1,0 +1,249 @@
+{
+  "name": "[TEST] RAG CHATBOT USING OPENAI PINECONE",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d1a84d86-24c6-4fad-a2a0-d50f8e98484a",
+      "name": "When chat message received",
+      "webhookId": "8455d00e-32ed-4a6c-8a61-f56e524556c1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        200
+      ],
+      "id": "2835a49c-b5be-4ba8-9473-268ac5eeee6c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "GhzUnBxpQ6xEuenM",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        220
+      ],
+      "id": "c0b37c0d-7819-4610-ad72-b7ede6cd083a",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "name": "tesla",
+        "description": "Returns documents relatet to Tesla Q3 and Q4, the financials, outlook, marges and everything important from the earnings report"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        460,
+        220
+      ],
+      "id": "934394a2-e2fb-4274-b2fc-a276e6968a01",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8ncourse",
+          "mode": "list",
+          "cachedResultName": "n8ncourse"
+        },
+        "options": {
+          "pineconeNamespace": "tesla"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        440
+      ],
+      "id": "43396305-7d53-40b9-8cf9-1bf5fd50d326",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "s9wYGtEP62DSnIif",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        140,
+        580
+      ],
+      "id": "32d9063d-fbb6-4ebf-ad8e-7df00cff134e",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "GhzUnBxpQ6xEuenM",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        380
+      ],
+      "id": "70a4202b-c1a6-4f02-b457-35a9bda15ca2",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "GhzUnBxpQ6xEuenM",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an AI assistant specialized in analyzing Tesla's quarterly financial reports. Your primary task is to answer questions accurately and precisely using the vector database, which contains relevant documents (Q3 and Q4 reports).\n\nOnly provide information that you retrieve from the documents (or verified expert knowledge). If something is not included in the dataset or is unclear, clearly state that you do not have sufficient information.\n\nStructure of your responses:\n• Concise and to the point\n• Specific numbers and facts, when available\n• Clearly indicate which quarterly report (Q3 or Q4) the information comes from\n\nObjective:\nProvide users with reliable and quick insights into Tesla's quarterly financials without unnecessary details."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        240,
+        -20
+      ],
+      "id": "1c702a5a-6cd6-4540-9fd3-8675fbebffb5",
+      "name": "AI Agent1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3409f6df-bd08-423d-8669-e5ff17a9e601",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f5b63e87d3a08027ad82f6128c42aba4f9d740ea0a50198c3429cc351736bda0"
+  },
+  "id": "jbEjuaAi07EGSEmp",
+  "tags": []
+}
