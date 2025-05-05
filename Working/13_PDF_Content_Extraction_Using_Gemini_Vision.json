@@ -1,0 +1,106 @@
+{
+  "name": "PDF Content Extraction Using Gemini Vision",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "Upload_File",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "516bf6ba-32d5-488d-bac9-0ca4b282cf18",
+      "name": "Transform to base64"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"Extract The Contents Of This PDF\"},\n      {\n        \"inline_data\": {\n          \"mime_type\": \"application/pdf\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "b4d07b5e-2f9c-4935-a9e8-61172caf61f9",
+      "name": "Extract PDF Content Using Gemini Vision",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "07QbCAkIZCt36tb9",
+          "name": "Query Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Gemini PDF Extraction",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload File",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c85cedcb-5fc0-48a7-8607-0b1defad0bc7",
+      "name": "On form submission",
+      "webhookId": "c8e998e5-6144-4ccd-a801-cd4ddd843950"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Transform to base64": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Content Using Gemini Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Transform to base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9332320b-2253-43c2-b9eb-f950d92edae1",
+  "meta": {
+    "instanceId": "f5b63e87d3a08027ad82f6128c42aba4f9d740ea0a50198c3429cc351736bda0"
+  },
+  "id": "wDqkpkEoSBIYnwAF",
+  "tags": []
+}

@@ -1,0 +1,238 @@
+{
+  "name": "[CLIENT] Telegram AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Caution\n- For avoiding misusing openai credits into our bot. we need to set into telegram trigger. in Restrict to User IDs field must be set to (message.from.id) into production",
+        "height": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -240
+      ],
+      "id": "3f50dcda-0ad5-405e-8950-928ac68cc5f6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        280
+      ],
+      "id": "bc2fb6ed-5c5b-41a8-b0f0-340e4b4c896f",
+      "name": "Get File From Telegram",
+      "webhookId": "a44b50a9-52e8-462e-8c7a-321e5d11014d",
+      "credentials": {
+        "telegramApi": {
+          "id": "OwpMovoDnK9zsjsP",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -380,
+        120
+      ],
+      "id": "882ae814-4565-49a4-b405-5f709e56d849",
+      "name": "Telegram Trigger (Upload File)",
+      "webhookId": "dd08d625-9ce8-4f9c-9965-e6592b05fce8",
+      "credentials": {
+        "telegramApi": {
+          "id": "OwpMovoDnK9zsjsP",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        500,
+        -180
+      ],
+      "id": "f279b86d-bb02-4e52-813e-af2002e266a4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"extract all text\" },\n      {\n        \"inline_data\": {\n          \"mime_type\": \"application/pdf\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        20
+      ],
+      "id": "bd7e7465-394e-4b07-8cd8-8545f332d269",
+      "name": "Gemini",
+      "notesInFlow": true,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "J4iX0h6HAdHXhmZh",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {
+          "keepSource": "json"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        140,
+        140
+      ],
+      "id": "154c1148-e22f-4cff-a011-3e648768d3a5",
+      "name": "Process File",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.candidates[0].content.parts[0].text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"driver_name\": \"FELIPE GALBAN, JOSE JAVIER\",\n  \"pay_to\": \"FELIPE GALBAN, JOSE JAVIER\",\n  \"period\": {\n    \"start\": \"2025-04-14\",\n    \"end\": \"2025-04-20\"\n  },\n  \"check_date\": \"2025-04-25\",\n  \"batch_no\": \"403\",\n  \"summary\": {\n    \"dispatch_pay\": 6762.00,\n    \"gross\": 6762.00,\n    \"adjustments\": 830.79,\n    \"net_amount\": 5931.21,\n    \"ytd_gross\": 89478.51,\n    \"ytd_net\": 73109.38\n  },\n  \"loads\": [\n    {\n      \"load_id\": \"336060\",\n      \"date\": \"2025-04-16\",\n      \"from\": \"PASCO, WA\",\n      \"to\": \"BLACKFORT, ID\",\n      \"pay_type\": \"Percent\",\n      \"rate\": 0.92,\n      \"revenue\": 800.00,\n      \"pay\": 736.00\n    },\n    {\n      \"load_id\": \"336277\",\n      \"date\": \"2025-04-16\",\n      \"from\": \"TERRETON, ID\",\n      \"to\": \"MARSHALL, MN\",\n      \"pay_type\": \"Percent\",\n      \"rate\": 0.92,\n      \"revenue\": 1900.00,\n      \"pay\": 1748.00\n    },\n    {\n      \"load_id\": \"336382\",\n      \"date\": \"2025-04-17\",\n      \"from\": \"Saint Paul, MN\",\n      \"to\": \"Denver, CO\",\n      \"pay_type\": \"Percent\",\n      \"rate\": 0.92,\n      \"revenue\": 2700.00,\n      \"pay\": 2484.00\n    },\n    {\n      \"load_id\": \"336732\",\n      \"date\": \"2025-04-20\",\n      \"from\": \"Aurora, CO\",\n      \"to\": \"SALT LAKE CITY\",\n      \"pay_type\": \"Percent\",\n      \"rate\": 0.92,\n      \"revenue\": 1000.00,\n      \"pay\": 920.00\n    },\n    {\n      \"load_id\": \"336993\",\n      \"date\": \"2025-04-20\",\n      \"from\": \"WVALLEYCITY,,\",\n      \"to\": \"Irvine,, CA\",\n      \"pay_type\": \"Percent\",\n      \"rate\": 0.92,\n      \"revenue\": 950.00,\n      \"pay\": 874.00\n    }\n  ],\n  \"adjustments\": [\n    {\n      \"type\": \"Administrative Fees\",\n      \"amount\": -40.00\n    },\n    {\n      \"type\": \"Highway Taxes\",\n      \"amount\": -50.00\n    },\n    {\n      \"type\": \"Highway Tolls\",\n      \"amount\": -230.79\n    },\n    {\n      \"type\": \"Liab & Cargo Insurance\",\n      \"amount\": -350.00\n    },\n    {\n      \"type\": \"Occupational Accident Insurance\",\n      \"amount\": -35.00\n    },\n    {\n      \"type\": \"Trailer Rental\",\n      \"amount\": -125.00\n    }\n  ],\n  \"balances\": {\n    \"advances_given\": 0.00,\n    \"driver_escrow\": 2000.00\n  }\n}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        560,
+        60
+      ],
+      "id": "3cf537b7-8487-4dcc-8605-f5932ab6dde2",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        240
+      ],
+      "id": "fddd7a51-6a50-4764-a04d-573a47575b89",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "f9PoEsdRE7H5P74J",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get File From Telegram": {
+      "main": [
+        [
+          {
+            "node": "Process File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger (Upload File)": {
+      "main": [
+        [
+          {
+            "node": "Get File From Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "Process File": {
+      "main": [
+        [
+          {
+            "node": "Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "88f757e6-d8a4-4236-a1ae-e8d20d3d995b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e8b79fa2b090e7ba98ec4720dc85b820fd9bee5d2cd6543eaeac3147841093eb"
+  },
+  "id": "fTs5w7nWfn5N4LZJ",
+  "tags": []
+}
