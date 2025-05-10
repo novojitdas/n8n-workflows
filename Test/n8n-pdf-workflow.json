@@ -1,0 +1,171 @@
+{
+  "name": "PDF Processing and Assignment Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      },
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "path": "/path/to/watched/folder",
+        "options": {}
+      },
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "PDF Extract",
+      "type": "n8n-nodes-base.pdfExtract",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Example to extract username from PDF text\nreturn [{\n  json: {\n    username: $json[\"text\"].match(/Username: (\\w+)/)[1],\n    extractedData: $json[\"text\"]\n  }\n}];"
+      },
+      "name": "Extract Fields",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "html": "<html><body><h1>Processed Data</h1><p>Username: {{$json.username}}</p></body></html>",
+        "options": {}
+      },
+      "name": "HTML to PDF",
+      "type": "n8n-nodes-base.htmlToPdf",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "fileName": "/path/to/output/folder/processed_{{$json.username}}.pdf"
+      },
+      "name": "Write Binary File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.username}}",
+              "operation": "equal",
+              "value2": "john_doe"
+            }
+          ]
+        }
+      },
+      "name": "Assign to User",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "operation": "update",
+        "id": "={{$json.username}}",
+        "fields": {
+          "assignedDocument": "processed_{{$json.username}}.pdf"
+        }
+      },
+      "name": "Update Assignment",
+      "type": "custom-database-update-node",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "PDF Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Extract": {
+      "main": [
+        [
+          {
+            "node": "Extract Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Fields": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Write Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Binary File": {
+      "main": [
+        [
+          {
+            "node": "Assign to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign to User": {
+      "main": [
+        [
+          {
+            "node": "Update Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

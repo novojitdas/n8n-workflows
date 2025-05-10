@@ -1,0 +1,86 @@
+{
+  "name": "PDF to JSON",
+  "nodes": [
+    {
+      "parameters": {
+        "folderPath": "/data",
+        "fileFilter": "*.pdf",
+        "pollInterval": 3000
+      },
+      "name": "Watch Folder",
+      "type": "n8n-nodes-base.watchFolder",
+      "position": [-420, -80],
+      "typeVersion": 1,
+      "id": "34bc99f1-5678-4b8e-bd9b-e10df8f1e45d"
+    },
+    {
+      "parameters": {
+        "filePath": "={{$json[\"filePath\"]}}"
+      },
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "position": [-220, -80],
+      "typeVersion": 1,
+      "id": "dee47b5d-f9f7-4119-8d4f-297b353951a0"
+    },
+    {
+      "parameters": {},
+      "name": "Read PDF",
+      "type": "n8n-nodes-base.readPDF",
+      "position": [-20, -80],
+      "typeVersion": 1,
+      "id": "637341d1-aba5-4fb6-8409-91dbbd7465fe",
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const extractedData = items[0].json;\nconst result = {\n  invoiceNumber: extractedData.text.match(/Invoice Number:\\s*(\\d+)/)?.[1],\n  customerName: extractedData.text.match(/Customer:\\s*(\\w+ \\w+)/)?.[1],\n  amount: extractedData.text.match(/Amount:\\s*\\$([\\d\\.]+)/)?.[1],\n  date: extractedData.text.match(/Date:\\s*(\\d{4}-\\d{2}-\\d{2})/)?.[1]\n};\nreturn [{ json: result }];"
+      },
+      "name": "Extract Data to JSON",
+      "type": "n8n-nodes-base.function",
+      "position": [180, -80],
+      "typeVersion": 1,
+      "id": "a2bc99f1-5678-4b8e-bd9b-e10df8f1e45c"
+    }
+  ],
+  "connections": {
+    "Watch Folder": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Read PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract Data to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "f5b63e87d3a08027ad82f6128c42aba4f9d740ea0a50198c3429cc351736bda0"
+  }
+}
