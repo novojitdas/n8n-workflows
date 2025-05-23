@@ -1,0 +1,67 @@
+{
+  "name": "Error Workflow Trigger and send mail",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "63fc45b0-136f-4922-a6e6-f16c94591859",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "novojitdas@gmail.com",
+        "subject": "=N8N Workflow Failed: {{ $json.workflow.name }}",
+        "emailType": "text",
+        "message": "=Emergency! Workflow failed \nWorkflow Name: {{ $json.workflow.name }}\nDate: {{ $now.format('yyyy-MM-dd') }}\nTime: {{ $now.format('t') }} \n\nError Details\n------------- \nLast Node: {{ $json.execution.lastNodeExecuted }}\nError Message: {{ $json.execution.error.message }}\nError Stack: {{ $json.execution.error.stack }}\n\nWorkflow URL: {{ $json.execution.url }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "64957261-0223-4bb9-ad66-4534d2651753",
+      "name": "Gmail",
+      "webhookId": "c732d96e-a1a2-4d81-8213-8e15fa9c1428",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VyIAPUKVYIyYJ6U8",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "07b3c432-b559-4d0b-b7d1-b4601e05c68b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e8b79fa2b090e7ba98ec4720dc85b820fd9bee5d2cd6543eaeac3147841093eb"
+  },
+  "id": "UXhd19zBVi6LlIHo",
+  "tags": []
+}

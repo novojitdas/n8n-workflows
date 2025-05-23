@@ -1,0 +1,79 @@
+{
+  "name": "HTML TO MARKDOWN",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "49d9806b-37f0-465c-84c7-b9e3bb3f3419",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://langchain-ai.github.io/langgraph/concepts/why-langgraph/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "def8dcf4-57e8-4deb-8b3f-4c67c9d2fd36",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "8774d6e6-a6d1-45ea-855c-224449925bcb",
+      "name": "Markdown"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8ca9ab42-9592-44cc-b506-07acfd115a9b",
+  "meta": {
+    "instanceId": "e8b79fa2b090e7ba98ec4720dc85b820fd9bee5d2cd6543eaeac3147841093eb"
+  },
+  "id": "yEJ5LfvCqwy9CFnx",
+  "tags": []
+}
